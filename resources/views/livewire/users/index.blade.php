@@ -5,7 +5,7 @@ use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
 use Livewire\WithPagination;
-use Illuminate\Pagination\LengthAwarePaginator; 
+use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Country;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -25,17 +25,15 @@ new class extends Component {
     public function clear(): void
     {
         $this->reset();
-        $this->resetPage(); 
+        $this->resetPage();
         $this->success('Filters cleared.', position: 'toast-bottom');
     }
 
     public function delete(User $user): void
-{
-    $user->delete();
-    $this->warning("$user->name deleted", 'Good bye!', position: 'toast-bottom');
-}
-
-
+    {
+        $user->delete();
+        $this->warning("$user->name deleted", 'Good bye!', position: 'toast-bottom');
+    }
 
     // Reset pagination when any component property changes
     public function updated($property): void
@@ -52,8 +50,8 @@ new class extends Component {
             ['key' => 'id', 'label' => '#', 'class' => 'w-1'],
             ['key' => 'name', 'label' => 'Name', 'class' => 'w-64'],
             // ['key' => 'country.name', 'label' => 'Country'],
-             //['key' => 'country_name', 'label' => 'Country'],
-             ['key' => 'country_name', 'label' => 'Country', 'class' => 'hidden lg:table-cell'], 
+            //['key' => 'country_name', 'label' => 'Country'],
+            ['key' => 'country_name', 'label' => 'Country', 'class' => 'hidden lg:table-cell'],
             ['key' => 'email', 'label' => 'E-mail', 'sortable' => false],
         ];
     }
@@ -68,19 +66,27 @@ new class extends Component {
     {
         return User::query()
             ->withAggregate('country', 'name')
-            // ->with(['country'])
-            // ->when($this->search, fn(Builder $q) => $q->where('name', 'like', "%$this->search%"))
-            // ->when($this->country_id, fn(Builder $q) => $q->where('country_id', $this->country_id)) 
+
             ->when($this->search, function (Builder $q) {
-            return $q->where('name', 'like', "%{$this->search}%");
-        })
-        ->when($this->country_id, function (Builder $q) {
-            return $q->where('country_id', $this->country_id);
-        })
+                return $q->where('name', 'like', "%{$this->search}%");
+            })
+            ->when($this->country_id, function (Builder $q) {
+                return $q->where('country_id', $this->country_id);
+            })
             ->orderBy(...array_values($this->sortBy))
             ->paginate(5);
+    }
 
-        
+    public function getActiveFiltersCountProperty(): int
+    {
+        $count = 0;
+        if ($this->country_id !== 0) {
+            $count++;
+        }
+        if (!empty($this->search)) {
+            $count++;
+        }
+        return $count;
     }
 
     public function with(): array
@@ -88,7 +94,7 @@ new class extends Component {
         return [
             'users' => $this->users(),
             'headers' => $this->headers(),
-            'countries' => Country::all(), 
+            'countries' => Country::all(),
         ];
     }
 }; ?>
@@ -100,7 +106,7 @@ new class extends Component {
             <x-input placeholder="Search..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass" />
         </x-slot:middle>
         <x-slot:actions>
-            <x-button label="Filters" badge="2" @click="$wire.drawer = true" responsive icon="o-funnel" />
+            <x-button label="Filters" :badge="$this->activeFiltersCount > 0 ? $this->activeFiltersCount : null" @click="$wire.drawer = true" responsive icon="o-funnel" />
         </x-slot:actions>
     </x-header>
 
@@ -115,10 +121,11 @@ new class extends Component {
     </x-card>
 
     <!-- FILTER DRAWER -->
-    <x-drawer wire:model="drawer" title="Filters" badge="2" right separator with-close-button class="lg:w-1/3 bg-red-500" >
+    <x-drawer wire:model="drawer" title="Filters" :badge="$this->activeFiltersCount > 0 ? $this->activeFiltersCount : null" right separator with-close-button class="lg:w-1/3 ">
         <div class="grip gap-5 ">
             <x-input placeholder="Search..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass" />
-            <x-select placeholder="Country" wire:model.live="country_id" :options="$countries" icon="o-flag" placeholder-value="0" /> 
+            <x-select placeholder="Country" wire:model.live="country_id" :options="$countries" icon="o-flag"
+                placeholder-value="0" />
         </div>
 
         <x-slot:actions>
