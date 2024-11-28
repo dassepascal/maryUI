@@ -47,7 +47,9 @@ new class extends Component {
     public function headers(): array
     {
         return [
+            ['key' => 'avatar', 'label' => '', 'class' => 'w-1'],
             ['key' => 'id', 'label' => '#', 'class' => 'w-1'],
+
             ['key' => 'name', 'label' => 'Name', 'class' => 'w-64'],
             // ['key' => 'country.name', 'label' => 'Country'],
             //['key' => 'country_name', 'label' => 'Country'],
@@ -112,7 +114,11 @@ new class extends Component {
 
     <!-- TABLE  -->
     <x-card>
-        <x-table :headers="$headers" :rows="$users" :sort-by="$sortBy" with-pagination link="users/{id}/edit?name={name}&city={city.name}">
+        <x-table :headers="$headers" :rows="$users" :sort-by="$sortBy" with-pagination
+            link="users/{id}/edit?name={name}&city={city.name}">
+            @scope('cell_avatar', $user)
+                <x-avatar image="{{ $user->avatar ?? '/empty-user.jpg' }}" class="!w-10" />
+            @endscope
             @scope('actions', $user)
                 <x-button icon="o-trash" wire:click="delete({{ $user['id'] }})" wire:confirm="Are you sure?" spinner
                     class="btn-ghost btn-sm text-red-500" />
