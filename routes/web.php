@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 // Users will be redirected to this route if not logged in
 Volt::route('/login', 'login')->name('login');
+Volt::route('/register', 'register');
  
 // Define the logout
 Route::get('/logout', function () {
