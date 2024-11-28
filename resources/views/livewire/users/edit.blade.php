@@ -6,7 +6,7 @@ use Livewire\Attributes\Rule;
 use App\Models\User;
 use App\Models\Country;
 use Livewire\WithFileUploads;
-use App\Models\Language; 
+use App\Models\Language;
 
 new class extends Component {
     use Toast, WithFileUploads;
@@ -30,7 +30,7 @@ new class extends Component {
     #[Rule('required')]
     public array $my_languages = [];
 
-     // Optional 
+    // Optional
     #[Rule('sometimes')]
     public ?string $bio = null;
 
@@ -61,6 +61,12 @@ new class extends Component {
 
         $this->success('User updated.', redirectTo: '/users');
     }
+    protected $listeners = ['trixUpdated' => 'updateBio'];
+
+    public function updateBio($value)
+    {
+        $this->bio = $value;
+    }
 
     // We also need this to fill Countries combobox on upcoming form
     public function with(): array
@@ -90,7 +96,7 @@ new class extends Component {
                 {{-- Multi selection --}}
                 <x-choices-offline label="My languages" wire:model="my_languages" :options="$languages" searchable />
 
-                <x-editor wire:model="bio" label="Bio" hint="The great biography" /> 
+                <livewire:trix-editor :content="$bio" label="Bio" hint="The great biography" />
 
                 <x-slot:actions>
                     <x-button label="Cancel" link="/users" />
