@@ -109,6 +109,7 @@ new class extends Component {
         </x-slot:middle>
         <x-slot:actions>
             <x-button label="Filters" :badge="$this->activeFiltersCount > 0 ? $this->activeFiltersCount : null" @click="$wire.drawer = true" responsive icon="o-funnel" />
+            <x-button label="Create" link="/users/create" responsive icon="o-plus" class="btn-primary" />
         </x-slot:actions>
     </x-header>
 

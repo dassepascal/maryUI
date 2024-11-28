@@ -76,6 +76,9 @@
     {{--  TOAST area --}}
     <x-toast />
 
+    {{-- SpotLight --}}
+    <x-spotlight /> 
+
     @livewireScripts
 </body>
 
